@@ -1,10 +1,9 @@
 package com.lin.nielsen.appointment.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lin.nielsen.appointment.entity.Appointment;
+import com.lin.nielsen.appointment.exception.NotFoundException;
 import com.lin.nielsen.appointment.service.AppointmentService;
-import org.hamcrest.Matchers;
+import com.lin.nielsen.appointment.utils.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,10 +18,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(SpringRunner.class)
 public class AppointmentRestControllerTest {
@@ -38,9 +37,9 @@ public class AppointmentRestControllerTest {
     private List<Appointment> results;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        this.results = this.makeAppointmentsList();
+        this.results = TestUtils.mockAppointmentsList();
     }
 
     @Test
@@ -52,42 +51,27 @@ public class AppointmentRestControllerTest {
 
     @Test
     public void get_Appointment_1() throws Exception {
-        Mockito.when(service.getAppointmentById(anyLong())).thenReturn(Optional.of(this.results.get(0)));
+        Mockito.when(service.getAppointmentById(anyLong())).thenReturn(this.results.get(0));
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/appointments/get/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         Mockito.verify(service, Mockito.times(1)).getAppointmentById(1L);
     }
 
+    @Test(expected = Exception.class)
+    public void get_Appointment_1000() throws Exception {
+        Mockito.when(service.getAppointmentById(anyLong())).thenThrow(NotFoundException.class);
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/appointments/get/1000"));
+    }
+
     @Test
     public void update_Appointment() throws Exception {
-        String jsonString = "{\n" +
-                "\"customerName\":\"Jonathan\"\n" +
-                "}";
-        Mockito.when(service.getAppointmentById(anyLong())).thenReturn(Optional.of(this.results.get(0)));
-        Mockito.when(service.updateAppointment(any(Appointment.class))).thenReturn(this.results.get(0));
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/appointments/update/1")
+        Map requestMap = TestUtils.mockValidRequestMap();
+        Mockito.when(service.getAppointmentById(anyLong())).thenReturn(this.results.get(0));
+        Mockito.when(service.updateAppointment(anyLong(), eq(requestMap))).thenReturn(this.results.get(0));
+        this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/appointments/update/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonString))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.customerName", Matchers.is("Jonathan")));
-    }
-
-    @Test(expected = Exception.class)
-    public void update_Appointment_bad_request() throws Exception {
-        String jsonString = "{\n" +
-                "\"fake_key\":\"fake_value\"\n" +
-                "}";
-        Mockito.when(service.getAppointmentById(anyLong())).thenReturn(Optional.of(this.results.get(0)));
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/appointments/update/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonString));
-        Mockito.verify(service, Mockito.times(0)).updateAppointment(any(Appointment.class));
-
-    }
-
-    private List<Appointment> makeAppointmentsList() throws Exception {
-        String input = "[{\"id\":1,\"customerName\":\"Jon\",\"appointmentDate\":\"2019-08-01T12:00:00.000+0000\",\"status\":\"PENDING\",\"price\":450.5},{\"id\":2,\"customerName\":\"Eric\",\"appointmentDate\":\"2019-08-01T14:00:00.000+0000\",\"status\":\"PROCESSING\",\"price\":725.5},{\"id\":3,\"customerName\":\"Mike\",\"appointmentDate\":\"2019-08-01T16:00:00.000+0000\",\"status\":\"COMPLETE\",\"price\":1000.0}]";
-        return new ObjectMapper().readValue(input, new TypeReference<List<Appointment>>() {});
+                .content(TestUtils.requestMapJsonString))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
 }
