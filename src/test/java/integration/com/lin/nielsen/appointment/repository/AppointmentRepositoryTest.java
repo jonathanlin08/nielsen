@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 @RunWith(SpringRunner.class)
@@ -37,6 +38,14 @@ public class AppointmentRepositoryTest {
         Assert.assertEquals(Status.PENDING, result.getStatus());
         Date expectDate = simpleDateFormat.parse("2019-08-01 08:00");
         Assert.assertEquals(expectDate, result.getAppointmentDate());
+    }
+
+    @Test
+    public void whenFindByTimeRange_thenReturn_2_appointments() throws ParseException {
+        Date startDate = simpleDateFormat.parse("2019-08-01 06:00");
+        Date endDate = simpleDateFormat.parse("2019-08-01 10:00");
+        List<Appointment> results = repository.findAllByTimeRange(startDate, endDate);
+        Assert.assertEquals(2, results.size());
     }
 
     @Test
