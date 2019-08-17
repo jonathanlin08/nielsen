@@ -6,11 +6,13 @@ Spring Boot
 
 Maven
 
-JPA
+Travis CI
+
+Heroku
 
 ## Pre-reqs
 
-Java, Maven (build tool)
+Java 8, Maven (build tool)
 
 ## How to run test
 
@@ -24,4 +26,4 @@ Java, Maven (build tool)
 
 ./mvnw clean package
 
-java -jar target/nielsen-sports-code-challenge-0.0.1-SNAPSHOT.jar
+java -jar target/*.jar
