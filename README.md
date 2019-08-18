@@ -2,13 +2,19 @@
 
 ## Technical stacks
 
-Spring Boot
+Spring Boot - JPA, Schedule Job
 
 Maven
 
-Travis CI
+Travis CI - CI build up on code push to github
 
-Heroku
+Heroku - Auto deploy upon success build on Travis CI
+
+PostgreSQL - Application Database on Heroku
+
+H2 - In memory database for test
+
+Swagger2 - REST API UI
 
 ## Pre-reqs
 
@@ -16,14 +22,14 @@ Java 8, Maven (build tool)
 
 ## How to run test
 
-./mvnw test
- 
-## How to start app
+    ./mvnw test
 
-./mvnw spring-boot:run 
+## How to build and start on local
 
-## How to build jar and start jar
+    build: ./mvnw clean package
 
-./mvnw clean package
+    Start app: java -jar target/*.jar or ./mvnw spring-boot:run 
 
-java -jar target/*.jar
+## Application Swagger URL
+    
+    https://jl-nielsen-assessment.herokuapp.com/swagger-ui.html
