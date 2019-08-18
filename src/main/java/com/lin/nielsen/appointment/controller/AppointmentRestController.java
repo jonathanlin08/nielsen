@@ -2,8 +2,6 @@ package com.lin.nielsen.appointment.controller;
 
 import com.lin.nielsen.appointment.entity.Appointment;
 import com.lin.nielsen.appointment.service.AppointmentService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +14,6 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/api/appointments")
 public class AppointmentRestController {
-
-    private static final Logger log = LoggerFactory.getLogger(AppointmentRestController.class);
 
     @Autowired
     private AppointmentService service;
